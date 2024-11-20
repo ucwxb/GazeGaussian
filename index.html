@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html>
+
+
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+    content="We propose GazeGaussian, a high-fidelity gaze redirection method that uses a two-stream 3DGS model to represent the face and eye regions separately.">
+  <meta name="keywords" content="3D Gaussian Splatting, Gaze Redirection">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GazeGaussian</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/face.svg">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+  <style>
+    .video-container {
+      margin-bottom: 20px;
+    }
+  </style>
+
+  <style>
+    .publication-links {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .highlighted-link {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 20px;
+      color: white;
+      text-decoration: none;
+      border-radius: 25px;
+      font-weight: bold;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .highlighted-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    .highlighted-link .icon {
+      margin-right: 8px;
+      font-size: 20px;
+    }
+
+    .github-link {
+      background: linear-gradient(45deg, #4CAF50, #2196F3);
+    }
+
+    .arxiv-link {
+      background: linear-gradient(45deg, #FFB74D, #FFA726);
+    }
+
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(33, 150, 243, 0.4);
+      }
+
+      70% {
+        box-shadow: 0 0 0 12px rgba(33, 150, 243, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(33, 150, 243, 0);
+      }
+    }
+
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+    .title-container {
+      text-align: center;
+      padding: 25px 0;
+      font-family: 'Roboto', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: baseline;
+      flex-wrap: wrap;
+    }
+
+    .main-title {
+      font-size: 2.8rem;
+      font-weight: 800;
+      margin-right: 10px;
+      background: linear-gradient(45deg, #FF4500, #FFA500, #00CED1, #4169E1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 300% 300%;
+      animation: gradient-shift 5s ease infinite;
+    }
+
+    .subtitle {
+      font-size: 2.8rem;
+      color: #333;
+      font-weight: 400;
+    }
+
+    @keyframes gradient-shift {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    .hero.is-light {
+      background: linear-gradient(135deg, #e0f7fa, #e8f5e9, #fff9c4);
+      padding: 10px 0;
+    }
+
+    .hero .container.is-max-desktop {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .hero .hero-body {
+      padding: 2rem 1.5rem;
+    }
+
+    .hero .video-container {
+      position: relative;
+      overflow: hidden;
+      border-radius: 15px;
+    }
+
+    .hero .video-container:hover {
+      transform: translateY(-5px);
+    }
+
+    .hero #video {
+      width: 100%;
+      display: block;
+    }
+
+    .dataset-btn {
+      background-color: #4a4a4a;
+      color: white;
+      transition: all 0.3s ease;
+    }
+
+    .dataset-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .dataset-btn.active {
+      background-color: #00d1b2;
+    }
+
+    .container.is-widescreen {
+      max-width: 1440px !important;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .container.is-middlewidescreen {
+      max-width: 1200px !important;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .video-container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    #result-video {
+      width: 100%;
+      height: auto;
+      max-height: 800px;
+      object-fit: contain;
+    }
+
+    .video-container video {
+      width: 100%;
+      height: auto;
+      border-radius: 15px;
+    }
+
+    .title.is-3 {
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      .title-container {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .main-title {
+        font-size: 2rem;
+        margin-right: 0;
+        margin-bottom: 5px;
+      }
+
+      .subtitle {
+        font-size: 2rem;
+      }
+
+      .hero.is-light {
+        padding: 30px 0;
+      }
+
+      .hero .video-container {
+        border-radius: 10px;
+      }
+    }
+
+    .column.is-narrow {
+      padding: 0 10px;
+    }
+
+    .field {
+      text-align: center;
+    }
+
+    .label {
+      margin-bottom: 5px;
+    }
+
+    .section.is-light {
+      background: linear-gradient(135deg, #e0f7fa, #e8f5e9, #fff9c4);
+      padding: 60px 0;
+    }
+
+    .section.is-light .container {
+      max-width: 1440px !important;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .section.is-light .hero-body {
+      padding: 2rem 1.5rem;
+    }
+
+    .colorful-title {
+      text-align: center;
+      padding: 20px 0;
+      color: #7e56d0;
+      font-size: 2.2rem;
+      font-weight: 1000;
+      margin-bottom: 30px;
+    }
+
+    .colorful-title h2 {
+      margin: 0;
+      padding: 0;
+    }
+
+    @keyframes gradient {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+  </style>
+  <style class="redeviation-bs-style" data-name="content">
+    /*! (c) Philipp Koenig under MS-RSL */
+    body>div#redeviation-bs-indicator>div {
+      opacity: 0;
+      pointer-events: none
+    }
+
+    body>#redeviation-bs-overlay.redeviation-bs-visible,
+    body>#redeviation-bs-sidebar.redeviation-bs-visible {
+      opacity: 1;
+      pointer-events: auto
+    }
+
+    body.redeviation-bs-noscroll {
+      overflow: hidden !important
+    }
+
+    body>div#redeviation-bs-indicator>div {
+      position: absolute;
+      transform: translate3d(-24px, 0, 0);
+      top: 0;
+      left: 0;
+      width: 24px !important;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 0 10px 10px 0;
+      transition: opacity .3s, transform .3s;
+      z-index: 2
+    }
+
+    body>div#redeviation-bs-indicator>div>span {
+      -webkit-mask: no-repeat center/24px;
+      -webkit-mask-image: url(chrome-extension://lmjefbghkfeppnpofmbfmhgodpclipbl/img/icon-bookmark.svg);
+      background-color: #ffffff;
+      position: absolute;
+      display: block;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%
+    }
+
+    body>div#redeviation-bs-indicator[data-pos=right] {
+      left: auto;
+      right: 0
+    }
+
+    body>div#redeviation-bs-indicator[data-pos=right]>div {
+      transform: translate3d(24px, 0, 0);
+      left: auto;
+      right: 0;
+      border-radius: 10px 0 0 10px
+    }
+
+    body>div#redeviation-bs-indicator.redeviation-bs-fullHeight>div {
+      border-radius: 0
+    }
+
+    body>div#redeviation-bs-indicator.redeviation-bs-hover>div {
+      transform: translate3d(0, 0, 0);
+      opacity: 1
+    }
+
+    body>div#redeviation-bs-indicator[data-pos=left].redeviation-bs-has-lsb {
+      height: 100% !important;
+      top: 0 !important
+    }
+
+    body>div#redeviation-bs-indicator[data-pos=left].redeviation-bs-has-lsb>div {
+      background: rgba(0, 0, 0, 0)
+    }
+
+    body>div#redeviation-bs-indicator[data-pos=left].redeviation-bs-has-lsb>div>span {
+      -webkit-mask-position-y: 20px
+    }
+
+    body>#redeviation-bs-sidebar {
+      width: 350px;
+      max-width: none;
+      height: 0;
+      z-index: 2147483646;
+      background-color: rgba(0, 0, 0, 0.6) !important;
+      color-scheme: auto !important;
+      speak: none;
+      border: none;
+      display: block !important;
+      transform: translate3d(-350px, 0, 0);
+      transition: width 0s .3s, height 0s .3s, opacity .3s, transform .3s
+    }
+
+    body>#redeviation-bs-sidebar[data-pos=right] {
+      left: auto;
+      right: 0;
+      transform: translate3d(350px, 0, 0)
+    }
+
+    body>#redeviation-bs-sidebar.redeviation-bs-visible {
+      width: calc(100% + 350px);
+      height: 100%;
+      transform: translate3d(0, 0, 0);
+      transition: opacity .3s, transform .3s
+    }
+
+    body>#redeviation-bs-sidebar.sidepanel {
+      width: 100% !important
+    }
+
+    body>#redeviation-bs-sidebar.redeviation-bs-hideMask {
+      background: none !important
+    }
+
+    body>#redeviation-bs-sidebar.redeviation-bs-hideMask:not(.redeviation-bs-hover) {
+      width: calc(350px + 50px)
+    }
+
+    body>#redeviation-bs-overlay {
+      width: 100%;
+      max-width: none;
+      height: 100%;
+      z-index: 2147483647;
+      border: none;
+      speak: none;
+      background: rgba(0, 0, 0, 0.5) !important;
+      color-scheme: auto !important;
+      transition: opacity .3s
+    }
+  </style>
+</head>
+
+<body>
+
+
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+
+            <h1 class="title is-1 publication-title">
+              GazeGaussian: High-Fidelity Gaze Redirection with 3D Gaussian
+              Splatting</h1>
+            <div class="is-size-4 publication-authors">
+              <span class="author-block">
+                <b>
+                  <nobr><a href="https://ucwxb.github.io/">Xiaobao Wei</a>,</nobr>
+                  <nobr><a href="https://chenvoid.github.io/">Peng Chen</a>,</nobr>
+                  <nobr>Guangyu Li,</nobr>
+                  <nobr><a href="https://lu-m13.github.io">Ming Lu</a>,</nobr>
+                  <nobr>Hui Chen<sup>†</sup>,</nobr>
+                  <nobr>Feng Tian</nobr>
+                </b>
+              </span>
+            </div>
+            <p>Institute of Software, Chinese Academy of Sciences, </p>
+            <p></p>University of Chinese Academy of Sciences, Intel Labs China</p>
+      
+            <div class="column has-text-centered">
+              <div class="publication-links">
+                <!-- PDF Link. -->
+                <span class="link-block">
+                  <a href="./static/file/GazeGaussian.pdf" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                    </span>
+                    <span>Paper</span>
+                  </a>
+                </span>
+                <!-- Code Link. -->
+                <span class="link-block">
+                  <a href="https://github.com/ucwxb/GazeGaussian"
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fab fa-github"></i>
+                    </span>
+                    <span>Code coming soon</span>
+                  </a>
+                </span>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  </section>
+
+  <section class="section">
+    <div class="container is-max-desktop">
+      <!-- Abstract. -->
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Abstract</h2>
+          <div class="content has-text-justified">
+            <p>
+              Gaze estimation encounters generalization challenges when dealing with out-of-distribution data. To
+              address this problem, recent methods use neural radiance fields (NeRF) to generate augmented data.
+              However, existing methods based on NeRF are computationally expensive and lack facial details. 3D Gaussian
+              Splatting (3DGS) has become the prevailing representation of neural fields. While 3DGS has been
+              extensively examined in head avatars, it faces challenges with accurate gaze control and generalization
+              across different subjects.
+          </div>
+          <div class="content has-text-centered">
+            <img src="./static/images/pipeline.png" alt="Pipeline">
+          </div>
+          <div class="content has-text-justified">
+            <p>
+              In this work, we propose GazeGaussian, a high-fidelity gaze redirection method that uses a two-stream 3DGS
+              model to represent the face and eye regions separately. By leveraging the unstructured nature of 3DGS, we
+              develop a novel eye representation for rigid eye rotation based on the target gaze direction. To enhance
+              synthesis generalization across various subjects, we integrate an expression-conditional module to guide
+              the neural renderer. Comprehensive experiments show that GazeGaussian outperforms existing methods in
+              rendering speed, gaze redirection accuracy, and facial synthesis across multiple datasets. We also
+              demonstrate that existing gaze estimation methods can leverage GazeGaussian to improve their
+              generalization performance.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="hero is-light method-comparison-section">
+    <div class="hero-body">
+      <div class="container is-widescreen">
+        <h2 class="title is-3 has-text-centered">Novel view and gaze synthesis comparison</h2>
+        <div style="width: 100%; margin: 0 auto;">
+          <div class="video-container">
+            <video id="method-comparison-video" controls="" autoplay="" loop="" muted=""
+              style="border-radius: 15px; width: 100%;" poster="./static/videos/subject0000.h5.jpg"
+              src="./static/videos/subject0000.h5.mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          <div id="comparison-controls" style="margin-top: 20px; text-align: center;">
+            <div class="buttons is-centered">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <!-- <div class="content has-text-centered">
+        <a class="icon-link"
+           href="./static/videos/nerfies_paper.pdf">
+          <i class="fas fa-file-pdf"></i>
+        </a>
+        <a class="icon-link" href="https://github.com/keunhong" class="external-link" disabled>
+          <i class="fab fa-github"></i>
+        </a>
+      </div> -->
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="content">
+            <p>
+              The website code is borrowed from the source code of <a
+                href="https://github.com/nerfies/nerfies.github.io">Nerfies</a> . We thank the authors for sharing the
+              templates.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const video = document.getElementById('method-comparison-video');
+      const controls = document.getElementById('comparison-controls');
+      const scenes = ['0000', '0009', '0039', '0044', '0046', '0055', '0069', '0072', '0075', '0078'];
+      const videoPath = './static/videos/';
+      let activeScene = `subject${scenes[0]}.h5`;
+
+      function preloadImage(url) {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve(url);
+          img.onerror = reject;
+          img.src = url;
+        });
+      }
+
+      // Create buttons
+      scenes.forEach(scene => {
+        const button = document.createElement('button');
+        button.className = 'button is-medium is-rounded dataset-btn';
+        button.textContent = scene;
+        button.dataset.scene = `subject${scene}.h5`;
+        controls.querySelector('.buttons').appendChild(button);
+      });
+
+      // Set initial active button
+      const activeButton = controls.querySelector(`button[data-scene="${activeScene}"]`);
+      if (activeButton) {
+        activeButton.classList.add('active');
+      } else {
+        console.error(`Button with data-scene="${activeScene}" not found`);
+      }
+
+
+      // Button click handler
+      controls.addEventListener('click', (e) => {
+        if (e.target.matches('button')) {
+          controls.querySelector('.active').classList.remove('active');
+          e.target.classList.add('active');
+          activeScene = e.target.dataset.scene;
+          updateVideo();
+        }
+      });
+
+      async function updateVideo() {
+        const videoSrc = `${videoPath}${activeScene}.mp4`;
+        const posterSrc = `${videoPath}${activeScene}.jpg`;
+
+        try {
+          await preloadImage(posterSrc);
+
+          video.poster = posterSrc;
+          video.src = videoSrc;
+          video.load();
+          video.play().catch(error => console.error('Error playing video:', error));
+        } catch (error) {
+          console.error('Error loading poster image:', error);
+          video.src = videoSrc;
+          video.load();
+          video.play().catch(error => console.error('Error playing video:', error));
+        }
+      }
+
+      // Initialize video
+      updateVideo();
+    });
+  </script>
+
+</body>
+
+
+
+</html>
