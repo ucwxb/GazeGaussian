@@ -1,5 +1,8 @@
 # GazeGaussian: High-Fidelity Gaze Redirection with 3D Gaussian Splatting
 
+## News
+- **[2025/6/26]** I-MedSAM is accepted by ICCV2025! Code will be released soon.
+
 ## Overview
 ![overview](./static/images/pipeline.png)
 
