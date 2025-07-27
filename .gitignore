@@ -174,3 +174,5 @@ wandb/
 work_dirs/
 log/
 checkpoint/
+data
+*.lnk
