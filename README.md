@@ -17,7 +17,7 @@ Gaze estimation encounters generalization challenges when dealing with out-of-di
 We recommend using conda for the installation of dependencies. Please enter the following command step by step for preparing the environment.
 
 ```bash
-git clone https://github.com/ucwxb/GazeGaussian --recusive
+git clone https://github.com/ucwxb/GazeGaussian
 cd GazeGaussian
 conda env create -f env.yaml
 conda activate gazegaussian
