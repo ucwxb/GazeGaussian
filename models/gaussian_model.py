@@ -166,7 +166,7 @@ class GaussianModel(nn.Module):
                     
                     if self.is_rotate_eye:
                         left_dists, left_idx, _ = knn_points(xyz, self.landmarks_3d_neutral[:6].unsqueeze(0).repeat(B, 1, 1))
-                        right_dists, right_idx, _ = knn_points(xyz, self.landmarks_3d_neutral[:6].unsqueeze(0).repeat(B, 1, 1))
+                        right_dists, right_idx, _ = knn_points(xyz, self.landmarks_3d_neutral[6:12].unsqueeze(0).repeat(B, 1, 1))
                         left_eye_weights = torch.clamp((self.dist_threshold_far - left_dists) / (self.dist_threshold_far - self.dist_threshold_near), 0.0, 1.0)
                         right_eye_weights = torch.clamp((self.dist_threshold_far - right_dists) / (self.dist_threshold_far - self.dist_threshold_near), 0.0, 1.0)
 
