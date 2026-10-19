@@ -126,11 +126,14 @@ Thanks to these excellent open-sourced repos!
 If you find our work useful for your research, please consider citing:
 
 ```bibtex
-@inproceedings{wei2025gazegaussian,
-  title={GazeGaussian: High-Fidelity Gaze Redirection with 3D Gaussian Splatting},
-  author  = {Wei, Xiaobao and Chen, Peng and Li, Guangyu and Lu, Ming and Chen, Hui and Tian, Feng},
-  booktitle={Proceedings of the IEEE/CVF international conference on computer vision},
-  year={2025}
+@misc{cao2026law,
+      title={LAW: Unifying Language, Action, and World Modeling for Agentic Physical Intelligence}, 
+      author={Jiajun Cao and Kai Tang and Bohua Zhang and Zezhong Qian and Ying Li and Xiaozhu Ju and Xiaobao Wei and Jiaming Liu and Yang Ding and Sixiang Chen and Yiding Sun and Siyuan Qian and Tinghao Wang and Jixian Wu and Yichen Guo and Yi Zhang and Shilong Zou and Yong Dai and Jian Tang and Shanghang Zhang},
+      year={2026},
+      eprint={2610.23334},
+      archivePrefix={arXiv},
+      primaryClass={cs.RO},
+      url={https://arxiv.org/abs/2610.23334}, 
 }
 
 ```
